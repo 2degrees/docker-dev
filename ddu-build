@@ -1,5 +1,21 @@
 #!/bin/bash
 . "$(dirname "${BASH_SOURCE}")/lib/bootstrap.sh"
+. "$(dirname "${BASH_SOURCE}")/lib/utils.sh"
 
+
+# The working tree overshadows the code in the container(s), which means that
+# the host must offer the *.egg-info directory for the distributions
+for setup_py_path in "$(find "$(get_project_root_path)" -name setup\.py)"; do
+    echo -n "Generating .egg-info directory for '$(python setup.py --name)'... "
+    python \
+        setup.py \
+        develop \
+        --editable \
+        --build-directory "$(dirname "${setup_py_path}")" \
+        --no-deps \
+        --dry-run \
+        >> /dev/null
+    echo "OK."
+done
 
 exec "$(dirname "${BASH_SOURCE}")/docker-compose-wrapper" build --pull
