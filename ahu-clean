@@ -1,0 +1,5 @@
+#!/bin/bash
+. "$(dirname $BASH_SOURCE)/bootstrap.sh"
+
+
+exec docker-compose down --rmi all --volumes
