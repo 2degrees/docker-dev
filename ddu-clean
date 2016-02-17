@@ -1,5 +1,5 @@
 #!/bin/bash
-. "$(dirname $BASH_SOURCE)/bootstrap.sh"
+. "$(dirname $BASH_SOURCE)/lib/bootstrap.sh"
 
 
-exec docker-compose down --rmi all --volumes
+exec "$(dirname "${BASH_SOURCE}")/docker-compose-wrapper" down --rmi all --volumes

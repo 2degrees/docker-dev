@@ -1,6 +1,5 @@
 #!/bin/bash
-
-. "$(dirname "${BASH_SOURCE}")/bootstrap.sh"
+. "$(dirname "${BASH_SOURCE}")/lib/bootstrap.sh"
 
 
 echo 'Deleting stale containers'

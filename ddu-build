@@ -1,0 +1,5 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE}")/lib/bootstrap.sh"
+
+
+exec "$(dirname "${BASH_SOURCE}")/docker-compose-wrapper" build --pull

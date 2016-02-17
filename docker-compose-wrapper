@@ -1,0 +1,9 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE}")/lib/bootstrap.sh"
+. "$(dirname "${BASH_SOURCE}")/lib/utils.sh"
+
+
+export COMPOSE_PROJECT_NAME="$(get_project_name)"
+exec docker-compose \
+    --file "$(get_project_root_path)/docker-compose.yml" \
+    ${@}
