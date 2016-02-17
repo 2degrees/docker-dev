@@ -1,0 +1,12 @@
+#!/bin/bash
+
+. "$(dirname "${BASH_SOURCE}")/bootstrap.sh"
+
+
+echo 'Deleting stale containers'
+docker ps -a | tail -n1 | grep -v ' Up ' | awk '{ print $1 }' | xargs --no-run-if-empty docker rm --force --volumes
+
+echo
+
+echo 'Deleting anonymous images'
+docker images | grep '<none>' | awk '{ print $3 }' | xargs --no-run-if-empty docker rmi
