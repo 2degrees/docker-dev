@@ -1,0 +1,59 @@
+#!/bin/bash
+. "$(dirname "${BASH_SOURCE}")/lib/bootstrap.sh"
+. "$(dirname "${BASH_SOURCE}")/lib/utils.sh"
+
+
+# ===== Constants and functions
+
+
+TEST_RUNNER_SERVICE_NAME="test"
+CONTAINER_TEST_REPORTS_PATH="/tmp/test-reports"
+
+
+function docker_clean_up() {
+    local test_runner_container_name="$1"
+
+    docker rm --volumes --force "${test_runner_container_name}" >>/dev/null 2>&1 || true
+    docker-compose down --rmi local --volumes >>/dev/null 2>&1 || true
+}
+
+
+function run_tests() {
+    local test_runner_container_name="$1"
+
+    docker-compose build --pull
+    docker-compose \
+        run \
+        -T \
+        --name "${test_runner_container_name}" \
+        "${TEST_RUNNER_SERVICE_NAME}"
+}
+
+
+function export_test_reports() {
+    local test_report_export_path="$1"
+    local test_runner_container_name="$2"
+
+    rm -rf "${test_report_export_path}"
+
+    docker \
+        cp \
+        "${test_runner_container_name}:${CONTAINER_TEST_REPORTS_PATH}" \
+        "${test_report_export_path}"
+}
+
+
+# ===== Main
+
+
+export COMPOSE_FILE="$1"
+TEST_REPORT_EXPORT_PATH="$2"
+
+export COMPOSE_PROJECT_NAME="$(get_project_name)"
+
+TEST_RUNNER_CONTAINER_NAME="${COMPOSE_PROJECT_NAME}-test"
+
+docker_clean_up "${TEST_RUNNER_CONTAINER_NAME}"
+run_tests "${TEST_RUNNER_CONTAINER_NAME}"
+export_test_reports "${TEST_REPORT_EXPORT_PATH}" "${TEST_RUNNER_CONTAINER_NAME}"
+docker_clean_up "${TEST_RUNNER_CONTAINER_NAME}"
