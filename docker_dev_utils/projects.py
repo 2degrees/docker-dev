@@ -1,18 +1,10 @@
-from os.path import join as join_path
-from subprocess import check_output as run_command
+from docker_dev_utils.docker_interface import run_docker_compose_subcommand
 
 
 def uninstall_project(project_path, project_name):
-    # TODO: Handle errors
-    docker_compose_project_file_path = \
-        join_path(project_path, 'docker-compose.yml')
-    run_command(
-        [
-            'docker-compose',
-            '--file={}'.format(docker_compose_project_file_path),
-            'down',
-            '--rmi=all',
-            '--volumes',
-        ],
-        env={'COMPOSE_PROJECT_NAME': project_name},
+    run_docker_compose_subcommand(
+        'down',
+        ['--rmi=all', '--volumes'],
+        project_path,
+        project_name,
     )

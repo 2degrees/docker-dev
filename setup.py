@@ -24,7 +24,6 @@ setup(
     install_requires=[
         'click == 6.6',
         'pyrecord == 1.0.1',
-        'docker-compose == 1.7.0',
     ],
     entry_points={
         'console_scripts': [
