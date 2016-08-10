@@ -1,12 +1,11 @@
-from functools import wraps as wrap_function
 from os import getcwd
 from os.path import basename
 
 import click
 
+from docker_dev_utils._logging import log_command_errors
 from docker_dev_utils.exceptions import ConfigurationError
-from docker_dev_utils.exceptions import DockerDevUtilsException
-from docker_dev_utils.projects import uninstall_project
+from docker_dev_utils.projects import uninstall_project, install_project
 from docker_dev_utils.vcs import get_repository_info_from_path
 
 
@@ -24,18 +23,6 @@ else:
     )
 
 
-def _print_expected_error(function_original):
-    @wrap_function(function_original)
-    def function_wrapped(*arg, **kwargs):
-        try:
-            return_code = function_original(*arg, **kwargs)
-        except DockerDevUtilsException as exc:
-            click.echo(exc, err=True)
-            return_code = 1
-        return return_code
-    return function_wrapped
-
-
 @click.group()
 @click.option(
     '--project-path',
@@ -48,7 +35,6 @@ def _print_expected_error(function_original):
     show_default=True,
 )
 @click.pass_context
-@_print_expected_error
 def main(context, project_path, project_name):
     # TODO: Should we require the path to docker-compose.yml instead and derive the project_path from it?
     # TODO: Make the `project_path` absolute
@@ -57,6 +43,6 @@ def main(context, project_path, project_name):
 
 @main.command()
 @click.pass_obj
-@_print_expected_error
+@log_command_errors
 def clean(obj):
     uninstall_project(obj['project_path'], obj['project_name'])
