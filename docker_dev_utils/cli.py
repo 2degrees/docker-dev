@@ -3,8 +3,8 @@ from os.path import basename
 
 import click
 
-from docker_dev_utils._logging import log_command_errors
 from docker_dev_utils.exceptions import ConfigurationError
+from docker_dev_utils._logging import handle_callback_exception
 from docker_dev_utils.projects import uninstall_project, install_project
 from docker_dev_utils.vcs import get_repository_info_from_path
 
@@ -35,6 +35,7 @@ else:
     show_default=True,
 )
 @click.pass_context
+@handle_callback_exception
 def main(context, project_path, project_name):
     # TODO: Should we require the path to docker-compose.yml instead and derive the project_path from it?
     # TODO: Make the `project_path` absolute
@@ -43,6 +44,6 @@ def main(context, project_path, project_name):
 
 @main.command()
 @click.pass_obj
-@log_command_errors
+@handle_callback_exception
 def clean(obj):
     uninstall_project(obj['project_path'], obj['project_name'])

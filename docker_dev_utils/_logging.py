@@ -1,79 +1,67 @@
 from functools import wraps as wrap_function
-from io import StringIO
 from logging import getLogger
-from logging.config import dictConfig
-from os import getcwd
-from os.path import join as join_path
+from logging.config import dictConfig as configure_logging
+from tempfile import NamedTemporaryFile
 
 import click
+from click.globals import get_current_context
 
 from docker_dev_utils.exceptions import DockerDevUtilsException
 
 
-_CURRENT_WORKDIR = getcwd()
+_ERROR_LOG_FILE = NamedTemporaryFile(prefix='docker-dev-utils-', delete=False)
+_ERROR_LOG_FILE_PATH = _ERROR_LOG_FILE.name
 
 
-_ERROR_LOG_FILE_NAME = 'docker-dev-utils.log'
-_ERROR_LOG_FILE_PATH = join_path(_CURRENT_WORKDIR, _ERROR_LOG_FILE_NAME)
-_ERROR_BUFFER_FILE = StringIO()
-
-
-_BASE_LOGGING_CONFIG = {
+_LOGGING_CONFIG = {
     'version': 1,
     'root': {
         'handlers': ['errors'],
     },
+    'formatters': {
+        'main': {
+            'format': '%(asctime)s %(levelname)s %(name)s: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
     'handlers': {
         'errors': {
-            'class': 'logging.StreamHandler',
+            'class': 'logging.FileHandler',
+            'filename': _ERROR_LOG_FILE_PATH,
             'level': 'INFO',
+            'formatter': 'main',
         },
     },
 }
 
 
-def _configure_logging():
-    logging_config = _BASE_LOGGING_CONFIG.copy()
-    logging_config['handlers']['errors']['stream'] = _ERROR_BUFFER_FILE
-    dictConfig(logging_config)
+def _log_callback_exception(exc):
+    logger = getLogger(__name__)
+    logger.exception('', exc_info=exc)
+
+    click.echo(
+        'Debugging info written to {!r}'.format(_ERROR_LOG_FILE_PATH),
+        err=True,
+    )
 
 
-def _write_command_errors_to_debug_file(command_function_original):
-    @wrap_function(command_function_original)
-    def command_function_wrapped(*args, **kwargs):
-        _configure_logging()
+def _fail(exc):
+    is_exception_supported = isinstance(exc, DockerDevUtilsException)
+    message = exc if is_exception_supported else 'Unexpected error'
+    click.echo('Error: ' + str(message), err=True)
 
-        return_code = command_function_original(*args, **kwargs)
-
-        was_function_successful = not return_code
-        if not was_function_successful:
-            _ERROR_BUFFER_FILE.seek(0)
-            with open(_ERROR_LOG_FILE_PATH, 'w') as error_log_file:
-                error_log_file.write(_ERROR_BUFFER_FILE.read())
-            click.echo(
-                'Debugging info written to {!r}'.format(_ERROR_LOG_FILE_PATH),
-                err=True,
-            )
-
-        return return_code
-    return command_function_wrapped
+    context = get_current_context()
+    context.exit(1)
 
 
-def log_command_errors(command_function_original):
-    @wrap_function(command_function_original)
-    @_write_command_errors_to_debug_file
-    def command_function_wrapped(*arg, **kwargs):
-        return_code = 1
+def handle_callback_exception(callback_original):
+    @wrap_function(callback_original)
+    def callback_wrapped(*args, **kwargs):
+        configure_logging(_LOGGING_CONFIG)
         try:
-            return_code = command_function_original(*arg, **kwargs)
+            return callback_original(*args, **kwargs)
         except Exception as exc:
-            is_exception_supported = isinstance(exc, DockerDevUtilsException)
-            message = exc if is_exception_supported else 'Unexpected error'
+            _log_callback_exception(exc)
+            _fail(exc)
 
-            click.echo(message, err=True)
-
-            logger = getLogger(__name__)
-            logger.exception(message)
-
-        return return_code
-    return command_function_wrapped
+    return callback_wrapped
