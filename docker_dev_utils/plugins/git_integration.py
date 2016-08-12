@@ -20,7 +20,7 @@ def _get_current_branch_name_in_path(path):
             ['symbolic-ref', '-q', 'HEAD'],
             cwd=path,
         )
-    except SubprocessError as exc:
+    except SubprocessError:
         branch_name = None
     else:
         branch_name = branch_reference.split('/')[-1]
