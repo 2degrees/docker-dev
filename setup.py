@@ -23,14 +23,13 @@ setup(
     packages=find_packages(),
     install_requires=[
         'click == 6.6',
-        'pyrecord == 1.0.1',
     ],
     entry_points={
         'console_scripts': [
             'docker-dev-utils = docker_dev_utils.cli:main',
         ],
-        'docker_dev_utils.vcs_repository_finders': [
-            'git = docker_dev_utils.plugins.git_integration:get_repository_info_from_path',
+        'docker_dev_utils.project_name_refiners': [
+            'git = docker_dev_utils.plugins.git_integration:get_active_branch_name',
         ],
     },
 )

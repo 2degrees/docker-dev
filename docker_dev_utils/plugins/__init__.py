@@ -1,7 +1,11 @@
 from pkg_resources import iter_entry_points
 
 
-def get_objects_in_entry_point_group(group_name):
+_ROOT_GROUP_NAME = 'docker_dev_utils'
+
+
+def get_objects_in_entry_point_group(subgroup_name):
+    group_name = '{}.{}'.format(_ROOT_GROUP_NAME, subgroup_name)
     objects_by_name = {}
     for entry_point in iter_entry_points(group_name):
         objects_by_name[entry_point.name] = entry_point.load()
