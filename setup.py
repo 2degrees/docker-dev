@@ -23,6 +23,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'click == 6.6',
+        'PyYAML == 3.11',
     ],
     entry_points={
         'console_scripts': [
@@ -30,6 +31,9 @@ setup(
         ],
         'docker_dev_utils.project_name_refiners': [
             'git = docker_dev_utils.plugins.git_integration:get_active_branch_name',
+        ],
+        'docker_dev_utils.pre_build_hooks': [
+            'python = docker_dev_utils.plugins.python_dev:build_python_distributions',
         ],
     },
 )

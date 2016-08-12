@@ -41,3 +41,13 @@ class MissingCommandError(DockerDevUtilsException):
         error_string = \
             'Command {!r} was not found in $PATH'.format(self._command_name)
         return error_string
+
+
+class PluginError(DockerDevUtilsException):
+
+    def __init__(self, plugin_name):
+        self._plugin_name = plugin_name
+
+    def __str__(self):
+        error_string = 'Plugin {!r} failed'.format(self._plugin_name)
+        return error_string
