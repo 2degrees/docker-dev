@@ -23,6 +23,15 @@ def _run_host_pre_build_hooks(project_path, project_name):
             raise PluginError(hook_name) from exc
 
 
+def run_project(project_path, project_name):
+    run_docker_compose_subcommand(
+        'up',
+        ['--force-recreate', '--abort-on-container-exit'],
+        project_path,
+        project_name,
+    )
+
+
 def uninstall_project(project_path, project_name):
     run_docker_compose_subcommand(
         'down',

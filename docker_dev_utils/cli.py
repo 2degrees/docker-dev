@@ -4,7 +4,7 @@ import click
 
 from docker_dev_utils._logging import handle_callback_exception
 from docker_dev_utils.projects import uninstall_project, \
-    get_project_name_refinement, install_project
+    get_project_name_refinement, install_project, run_project
 
 
 def _convert_click_path_arg_to_absolute(ctx, param, value):
@@ -44,6 +44,14 @@ def main(project_path, project_name):
 def build(context):
     main_args = context.parent.params
     install_project(main_args['project_path'], main_args['project_name'])
+
+
+@main.command()
+@click.pass_context
+@handle_callback_exception
+def up(context):
+    main_args = context.parent.params
+    run_project(main_args['project_path'], main_args['project_name'])
 
 
 @main.command()
