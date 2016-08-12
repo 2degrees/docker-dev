@@ -1,23 +1,20 @@
-from os.path import basename, abspath
+from os.path import basename, dirname
 
 import click
-
 from docker_dev_utils._logging import handle_callback_exception
 from docker_dev_utils.projects import uninstall_project, \
     get_project_name_refinement, install_project, run_project
-
-
-def _convert_click_path_arg_to_absolute(ctx, param, value):
-    return abspath(value)
 
 
 def _calculate_default_project_name(ctx, param, value):
     if value:
         project_name = value
     else:
-        project_path = ctx.params['project_path']
+        docker_compose_file_path = ctx.params['docker_compose_file_path']
+        project_path = dirname(docker_compose_file_path)
         project_name = basename(project_path)
-        project_name_refinement = get_project_name_refinement(project_path)
+        project_name_refinement = \
+            get_project_name_refinement(docker_compose_file_path)
         if project_name_refinement:
             project_name = '{}-{}'.format(project_name, project_name_refinement)
     return project_name
@@ -25,16 +22,15 @@ def _calculate_default_project_name(ctx, param, value):
 
 @click.group()
 @click.option(
-    '--project-path',
-    default='.',
+    '--docker-compose-file-path',
+    default='docker-compose.yml',
     show_default=True,
-    callback=_convert_click_path_arg_to_absolute,
     is_eager=True,
+    type=click.Path(exists=True, dir_okay=False, resolve_path=True),
 )
 @click.option('--project-name', callback=_calculate_default_project_name)
 @handle_callback_exception
-def main(project_path, project_name):
-    # TODO: Should we require the path to docker-compose.yml instead and derive the project_path from it?
+def main(docker_compose_file_path, project_name):
     pass
 
 
@@ -43,7 +39,10 @@ def main(project_path, project_name):
 @handle_callback_exception
 def build(context):
     main_args = context.parent.params
-    install_project(main_args['project_path'], main_args['project_name'])
+    install_project(
+        main_args['docker_compose_file_path'],
+        main_args['project_name'],
+    )
 
 
 @main.command()
@@ -51,7 +50,10 @@ def build(context):
 @handle_callback_exception
 def up(context):
     main_args = context.parent.params
-    run_project(main_args['project_path'], main_args['project_name'])
+    run_project(
+        main_args['docker_compose_file_path'],
+        main_args['project_name'],
+    )
 
 
 @main.command()
@@ -59,4 +61,7 @@ def up(context):
 @handle_callback_exception
 def clean(context):
     main_args = context.parent.params
-    uninstall_project(main_args['project_path'], main_args['project_name'])
+    uninstall_project(
+        main_args['docker_compose_file_path'],
+        main_args['project_name'],
+    )

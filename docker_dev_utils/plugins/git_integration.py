@@ -1,12 +1,15 @@
+from os.path import dirname
+
 from docker_dev_utils.exceptions import VCSError, MissingCommandError, \
     SubprocessError
 from docker_dev_utils.subprocess import run_command
 
 
-def get_active_branch_name(path):
+def get_active_branch_name(docker_compose_file_path):
     _assert_git_executable_is_available()
 
-    branch_name = _get_current_branch_name_in_path(path)
+    project_path = dirname(docker_compose_file_path)
+    branch_name = _get_current_branch_name_in_path(project_path)
     return branch_name
 
 

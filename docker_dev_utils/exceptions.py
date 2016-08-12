@@ -6,10 +6,6 @@ class VCSError(DockerDevUtilsException):
     pass
 
 
-class ConfigurationError(DockerDevUtilsException):
-    pass
-
-
 class SubprocessError(DockerDevUtilsException):
 
     def __init__(self, command_args, return_code, stderr_bytes):

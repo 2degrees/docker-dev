@@ -11,20 +11,20 @@ from yaml import safe_load as yaml_deserialize
 _LOGGER = getLogger(__name__)
 
 
-def build_python_distributions(project_path, project_name):
+def build_python_distributions(docker_compose_file_path, project_name):
     docker_compose_config = \
-        _get_docker_compose_config(project_name, project_path)
+        _get_docker_compose_config(docker_compose_file_path, project_name)
     services = docker_compose_config['services'].values()
     build_dir_paths = {s['build']['context'] for s in services if 'build' in s}
     for dir_path in build_dir_paths:
         _generate_egg_info_directory(dir_path)
 
 
-def _get_docker_compose_config(project_name, project_path):
+def _get_docker_compose_config(docker_compose_file_path, project_name):
     docker_compose_config_yaml = run_docker_compose_subcommand(
         'config',
         [],
-        project_path,
+        docker_compose_file_path,
         project_name,
     )
     docker_compose_config = yaml_deserialize(docker_compose_config_yaml)
