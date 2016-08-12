@@ -42,6 +42,8 @@ class MissingCommandError(DockerDevUtilsException):
 class PluginError(DockerDevUtilsException):
 
     def __init__(self, plugin_name):
+        super(PluginError, self).__init__()
+
         self._plugin_name = plugin_name
 
     def __str__(self):
