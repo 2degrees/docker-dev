@@ -1,6 +1,11 @@
-from docker_dev_utils.docker_interface import run_docker_compose_subcommand
-from docker_dev_utils.exceptions import VCSError, PluginError
+from shutil import rmtree
+
+from docker_dev_utils.docker_interface import run_docker_compose_subcommand, \
+    get_docker_compose_config, run_docker_subcommand
+from docker_dev_utils.exceptions import VCSError, PluginError, SubprocessError
 from docker_dev_utils.plugins import get_objects_in_entry_point_group
+
+_CONTAINER_TEST_REPORTS_PATH = "/tmp/test-reports"
 
 
 def install_project(docker_compose_file_path, project_name):
@@ -29,6 +34,50 @@ def run_project(docker_compose_file_path, project_name):
         ['--force-recreate', '--abort-on-container-exit'],
         docker_compose_file_path,
         project_name,
+    )
+
+
+def test_project(docker_compose_file_path, project_name):
+    install_project(docker_compose_file_path, project_name)
+
+    test_service_names = \
+        _get_test_service_names(docker_compose_file_path, project_name)
+    for service_name in test_service_names:
+        _run_test_service(docker_compose_file_path, project_name, service_name)
+
+
+def _get_test_service_names(docker_compose_file_path, project_name):
+    docker_compose_config = \
+        get_docker_compose_config(docker_compose_file_path, project_name)
+    service_names = docker_compose_config['services'].keys()
+    test_service_names = [n for n in service_names if n.startswith('test')]
+    return test_service_names
+
+
+def _run_test_service(docker_compose_file_path, project_name, service_name):
+    try:
+        run_docker_compose_subcommand(
+            'run',
+            ['-T', '--name', project_name, service_name],
+            docker_compose_file_path,
+            project_name,
+        )
+        _export_test_results(project_name, service_name)
+    finally:
+        try:
+            run_docker_subcommand('rm', ['--volumes', '--force', project_name])
+        except SubprocessError:
+            pass
+
+
+def _export_test_results(project_name, service_name):
+    rmtree(service_name, ignore_errors=True)
+    run_docker_subcommand(
+        'cp',
+        [
+            '{}:{}'.format(project_name, _CONTAINER_TEST_REPORTS_PATH),
+            service_name,
+        ],
     )
 
 

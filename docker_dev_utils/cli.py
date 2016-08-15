@@ -1,9 +1,11 @@
 from os.path import basename, dirname
 
 import click
+
 from docker_dev_utils._logging import handle_callback_exception
+from docker_dev_utils.exceptions import SubprocessError
 from docker_dev_utils.projects import uninstall_project, \
-    get_project_name_refinement, install_project, run_project
+    get_project_name_refinement, install_project, run_project, test_project
 
 
 def _calculate_default_project_name(ctx, param, value):
@@ -54,6 +56,23 @@ def up(context):
         main_args['docker_compose_file_path'],
         main_args['project_name'],
     )
+
+
+@main.command()
+@click.pass_context
+@handle_callback_exception
+def test(context):
+    main_args = context.parent.params
+    docker_compose_file_path = main_args['docker_compose_file_path']
+    base_project_name = main_args['project_name']
+    project_name = base_project_name + '-test'
+
+    try:
+        uninstall_project(docker_compose_file_path, project_name)
+    except SubprocessError:
+        pass
+    test_project(docker_compose_file_path, project_name)
+    uninstall_project(docker_compose_file_path, project_name)
 
 
 @main.command()
