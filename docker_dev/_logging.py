@@ -6,11 +6,11 @@ from tempfile import NamedTemporaryFile
 import click
 from click.globals import get_current_context
 
-from docker_dev_utils.exceptions import DockerDevUtilsException
+from docker_dev.exceptions import DockerDevUtilsException
 
 
 _ERROR_LOG_FILE = \
-    NamedTemporaryFile(prefix='docker-dev-utils-', suffix='.log', delete=False)
+    NamedTemporaryFile(prefix='docker-dev-', suffix='.log', delete=False)
 _ERROR_LOG_FILE_PATH = _ERROR_LOG_FILE.name
 
 

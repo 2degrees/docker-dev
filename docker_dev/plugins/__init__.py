@@ -1,7 +1,7 @@
 from pkg_resources import iter_entry_points
 
 
-_ROOT_GROUP_NAME = 'docker_dev_utils'
+_ROOT_GROUP_NAME = 'docker_dev'
 
 
 def get_objects_in_entry_point_group(subgroup_name):

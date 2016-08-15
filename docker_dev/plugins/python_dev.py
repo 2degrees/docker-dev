@@ -3,8 +3,8 @@ from os.path import isfile as is_file
 from os.path import join as join_path
 from sys import executable as PYTHON_INTERPRETER_PATH
 
-from docker_dev_utils.docker_interface import get_docker_compose_config
-from docker_dev_utils.subprocess import run_command
+from docker_dev.docker_interface import get_docker_compose_config
+from docker_dev.subprocess import run_command
 
 
 _LOGGER = getLogger(__name__)

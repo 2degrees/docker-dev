@@ -1,4 +1,4 @@
-from docker_dev_utils.subprocess import run_command
+from docker_dev.subprocess import run_command
 from yaml import safe_load as yaml_deserialize
 
 

@@ -2,9 +2,9 @@ from os.path import basename, dirname
 
 import click
 
-from docker_dev_utils._logging import handle_callback_exception
-from docker_dev_utils.exceptions import SubprocessError
-from docker_dev_utils.projects import uninstall_project, \
+from docker_dev._logging import handle_callback_exception
+from docker_dev.exceptions import SubprocessError
+from docker_dev.projects import uninstall_project, \
     get_project_name_refinement, install_project, run_project, test_project
 
 

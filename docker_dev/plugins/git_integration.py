@@ -1,8 +1,8 @@
 from os.path import dirname
 
-from docker_dev_utils.exceptions import VCSError, MissingCommandError, \
+from docker_dev.exceptions import VCSError, MissingCommandError, \
     SubprocessError
-from docker_dev_utils.subprocess import run_command
+from docker_dev.subprocess import run_command
 
 
 def get_active_branch_name(docker_compose_file_path):

@@ -4,7 +4,7 @@ from subprocess import CalledProcessError
 from subprocess import check_output
 from tempfile import TemporaryFile
 
-from docker_dev_utils.exceptions import SubprocessError, \
+from docker_dev.exceptions import SubprocessError, \
     MissingCommandError
 
 

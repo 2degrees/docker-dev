@@ -10,11 +10,10 @@ _README = open(path.join(_HERE, 'README.rst')).read().strip()
 
 
 setup(
-    name='docker-dev-utils',
+    name='docker-dev',
     version=_VERSION,
     description='Development tools for Docker',
     long_description=_README,
-    url='https://pythonhosted.org/docker-dev-utils/',
     author='2degrees',
     author_email='2degrees-floss@googlegroups.com',
     classifiers=[],
@@ -27,13 +26,13 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'docker-dev-utils = docker_dev_utils.cli:main',
+            'docker-dev = docker_dev.cli:main',
         ],
-        'docker_dev_utils.project_name_refiners': [
-            'git = docker_dev_utils.plugins.git_integration:get_active_branch_name',
+        'docker_dev.project_name_refiners': [
+            'git = docker_dev.plugins.git_integration:get_active_branch_name',
         ],
-        'docker_dev_utils.pre_build_hooks': [
-            'python = docker_dev_utils.plugins.python_dev:build_python_distributions',
+        'docker_dev.pre_build_hooks': [
+            'python = docker_dev.plugins.python_dev:build_python_distributions',
         ],
     },
 )

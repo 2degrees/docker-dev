@@ -1,9 +1,9 @@
 from shutil import rmtree
 
-from docker_dev_utils.docker_interface import run_docker_compose_subcommand, \
+from docker_dev.docker_interface import run_docker_compose_subcommand, \
     get_docker_compose_config, run_docker_subcommand
-from docker_dev_utils.exceptions import VCSError, PluginError, SubprocessError
-from docker_dev_utils.plugins import get_objects_in_entry_point_group
+from docker_dev.exceptions import VCSError, PluginError, SubprocessError
+from docker_dev.plugins import get_objects_in_entry_point_group
 
 _CONTAINER_TEST_REPORTS_PATH = "/tmp/test-reports"
 
