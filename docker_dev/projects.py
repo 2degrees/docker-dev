@@ -107,7 +107,7 @@ def uninstall_project(docker_compose_file_path, project_name):
 
 def get_project_name_refinement(path):
     project_name_refiners = get_objects_in_entry_point_group(
-        'project_name_refiners',
+        'project_name_suffix',
     )
     project_name_refinement = None
     for project_name_refiner in project_name_refiners.values():

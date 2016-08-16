@@ -21,7 +21,7 @@ from setuptools import setup
 
 _HERE = path.abspath(path.dirname(__file__))
 _VERSION = open(path.join(_HERE, 'VERSION.txt')).readline().rstrip()
-_README = open(path.join(_HERE, 'README.rst')).read().strip()
+_README = open(path.join(_HERE, 'README.md')).read().strip()
 
 
 setup(
@@ -44,7 +44,7 @@ setup(
         'console_scripts': [
             'docker-dev = docker_dev.cli:main',
         ],
-        'docker_dev.project_name_refiners': [
+        'docker_dev.project_name_suffix': [
             'git = docker_dev.plugins.git_integration:get_active_branch_name',
         ],
     },
