@@ -1,0 +1,10 @@
+version: "2"
+services:
+  main:
+    build:
+      context: "python-distribution-1/"
+      dockerfile: "Dockerfile"
+    command: "echo 'main'"
+  child:
+    extends: "main"
+    command: "whoami"
