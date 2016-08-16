@@ -93,7 +93,7 @@ def test(context):
 @main.command()
 @click.pass_context
 @handle_callback_exception
-def clean(context):
+def down(context):
     main_args = context.parent.params
     uninstall_project(
         main_args['docker_compose_file_path'],
