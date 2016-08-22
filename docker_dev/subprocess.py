@@ -13,7 +13,6 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from io import BytesIO
 from locale import getpreferredencoding
 from os import environ
 from subprocess import CalledProcessError, check_call
@@ -37,7 +36,7 @@ def run_command(
     command_parts = [command_name] + command_args
     additional_environ = additional_environ or {}
     command_environ = dict(additional_environ, PATH=environ['PATH'])
-    command_stdout = BytesIO() if return_stdout else stdout
+    command_stdout = TemporaryFile() if return_stdout else stdout
     command_stderr = TemporaryFile()
     try:
         check_call(
@@ -58,6 +57,7 @@ def run_command(
         raise MissingCommandError(command_name)
 
     if return_stdout:
-        command_stdout_bytes = command_stdout.getvalue()
+        command_stdout.seek(0)
+        command_stdout_bytes = command_stdout.read()
         command_stdout_str = command_stdout_bytes.decode(_SYSTEM_ENCODING)
         return command_stdout_str.rstrip()
