@@ -13,10 +13,11 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from io import BytesIO
 from locale import getpreferredencoding
 from os import environ
-from subprocess import CalledProcessError
-from subprocess import check_output
+from subprocess import CalledProcessError, check_call
+from sys import stdout
 from tempfile import TemporaryFile
 
 from docker_dev.exceptions import SubprocessError, \
@@ -26,15 +27,23 @@ from docker_dev.exceptions import SubprocessError, \
 _SYSTEM_ENCODING = getpreferredencoding()
 
 
-def run_command(command_name, command_args, additional_environ=None, **kwargs):
+def run_command(
+    command_name,
+    command_args,
+    additional_environ=None,
+    return_stdout=True,
+    **kwargs
+):
     command_parts = [command_name] + command_args
     additional_environ = additional_environ or {}
     command_environ = dict(additional_environ, PATH=environ['PATH'])
+    command_stdout = BytesIO() if return_stdout else stdout
     command_stderr = TemporaryFile()
     try:
-        command_stdout_bytes = check_output(
+        check_call(
             command_parts,
             env=command_environ,
+            stdout=command_stdout,
             stderr=command_stderr,
             **kwargs
         )
@@ -47,6 +56,8 @@ def run_command(command_name, command_args, additional_environ=None, **kwargs):
         )
     except FileNotFoundError:
         raise MissingCommandError(command_name)
-    else:
+
+    if return_stdout:
+        command_stdout_bytes = command_stdout.getvalue()
         command_stdout_str = command_stdout_bytes.decode(_SYSTEM_ENCODING)
         return command_stdout_str.rstrip()

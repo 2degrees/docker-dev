@@ -49,6 +49,7 @@ def run_project(docker_compose_file_path, project_name):
         ['--force-recreate', '--abort-on-container-exit'],
         docker_compose_file_path,
         project_name,
+        return_stdout=False,
     )
 
 
