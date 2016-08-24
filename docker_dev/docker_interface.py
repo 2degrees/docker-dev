@@ -22,7 +22,7 @@ def run_docker_compose_subcommand(
     subcommand_args,
     docker_compose_file_path,
     project_name,
-    return_stdout=True,
+    return_stdout=False,
 ):
     project_file_arg = '--file={}'.format(docker_compose_file_path)
     command_args = [project_file_arg, subcommand_name] + subcommand_args
@@ -42,6 +42,7 @@ def get_docker_compose_config(docker_compose_file_path, project_name):
         [],
         docker_compose_file_path,
         project_name,
+        return_stdout=True,
     )
     docker_compose_config = yaml_deserialize(docker_compose_config_yaml)
     return docker_compose_config
