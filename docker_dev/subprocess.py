@@ -37,22 +37,15 @@ def run_command(
     additional_environ = additional_environ or {}
     command_environ = dict(additional_environ, PATH=environ['PATH'])
     command_stdout = TemporaryFile() if return_stdout else stdout
-    command_stderr = TemporaryFile()
     try:
         check_call(
             command_parts,
             env=command_environ,
             stdout=command_stdout,
-            stderr=command_stderr,
             **kwargs
         )
     except CalledProcessError as exc:
-        command_stderr.seek(0)
-        raise SubprocessError(
-            command_parts,
-            exc.returncode,
-            command_stderr.read(),
-        )
+        raise SubprocessError(command_parts, exc.returncode) from exc
     except FileNotFoundError:
         raise MissingCommandError(command_name)
 
