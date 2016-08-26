@@ -77,18 +77,25 @@ def up(context):
 @main.command()
 @click.pass_context
 @handle_callback_exception
-def test(context):
+@click.option('--force-build', is_flag=True)
+@click.option('--cleanup', is_flag=True)
+def test(context, force_build, cleanup):
     main_args = context.parent.params
     docker_compose_file_path = main_args['docker_compose_file_path']
     base_project_name = main_args['project_name']
     project_name = base_project_name + '-test'
 
-    try:
-        uninstall_project(docker_compose_file_path, project_name)
-    except SubprocessError:
-        pass
+    if force_build:
+        try:
+            uninstall_project(docker_compose_file_path, project_name)
+        except SubprocessError:
+            pass
+        install_project(docker_compose_file_path, project_name)
+
     test_project(docker_compose_file_path, project_name)
-    uninstall_project(docker_compose_file_path, project_name)
+
+    if cleanup:
+        uninstall_project(docker_compose_file_path, project_name)
 
 
 @main.command()

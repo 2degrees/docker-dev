@@ -53,8 +53,6 @@ def run_project(docker_compose_file_path, project_name):
 
 
 def test_project(docker_compose_file_path, project_name):
-    install_project(docker_compose_file_path, project_name)
-
     test_service_names = \
         _get_test_service_names(docker_compose_file_path, project_name)
     for service_name in test_service_names:
