@@ -18,6 +18,7 @@ from os.path import basename, dirname
 import click
 
 from docker_dev._logging import handle_callback_exception
+from docker_dev.docker_interface import run_docker_compose_subcommand
 from docker_dev.exceptions import SubprocessError
 from docker_dev.projects import uninstall_project, \
     get_project_name_refinement, install_project, run_project, test_project
@@ -96,6 +97,21 @@ def test(context):
 def down(context):
     main_args = context.parent.params
     uninstall_project(
+        main_args['docker_compose_file_path'],
+        main_args['project_name'],
+    )
+
+
+@main.command(context_settings={'ignore_unknown_options': True})
+@click.pass_context
+@handle_callback_exception
+@click.argument('subcommand')
+@click.argument('subcommand-args', type=click.UNPROCESSED, nargs=-1)
+def dc(context, subcommand, subcommand_args):
+    main_args = context.parent.params
+    run_docker_compose_subcommand(
+        subcommand,
+        list(subcommand_args),
         main_args['docker_compose_file_path'],
         main_args['project_name'],
     )
