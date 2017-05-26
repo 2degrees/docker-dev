@@ -3,8 +3,8 @@
 # Copyright (c) 2016, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of django-pastedeploy-settings
-# <https://github.com/2degrees/django-pastedeploy-settings>, which is subject
+# This file is part of docker-dev
+# <https://github.com/2degrees/docker-dev>, which is subject
 # to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
