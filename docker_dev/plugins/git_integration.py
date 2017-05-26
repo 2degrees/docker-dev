@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2016, 2degrees Limited.
+# Copyright (c) 2016-2017, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of docker-dev
@@ -13,32 +13,53 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from os.path import dirname
+from os.path import basename, relpath
 
 from docker_dev.exceptions import VCSError, MissingCommandError, \
     SubprocessError
 from docker_dev.subprocess import run_command
 
 
-def get_active_branch_name(docker_compose_file_path):
+def get_project_name(project_path):
     _assert_git_executable_is_available()
 
-    project_path = dirname(docker_compose_file_path)
-    branch_name = _get_current_branch_name_in_path(project_path)
-    return branch_name
+    repo_path = _get_repo_path_from_path(project_path)
+    if repo_path:
+        project_name_parts = [basename(repo_path)]
+
+        project_path_relative = relpath(project_path, repo_path)
+        if project_path_relative:
+            project_name_parts.append(project_path_relative.replace('/', ''))
+
+        project_name_parts.append(
+            _get_current_branch_name_in_path(project_path),
+        )
+
+        project_name = '-'.join(project_name_parts)
+    else:
+        project_name = None
+    return project_name
 
 
-def _get_current_branch_name_in_path(path):
+def _get_repo_path_from_path(path):
     try:
-        branch_reference = run_command(
+        repo_path = run_command(
             'git',
-            ['symbolic-ref', '-q', 'HEAD'],
+            ['rev-parse', '--show-toplevel'],
             cwd=path,
         )
     except SubprocessError:
-        branch_name = None
-    else:
-        branch_name = branch_reference.split('/')[-1]
+        repo_path = None
+    return repo_path
+
+
+def _get_current_branch_name_in_path(path):
+    branch_reference = run_command(
+        'git',
+        ['symbolic-ref', '-q', 'HEAD'],
+        cwd=path,
+    )
+    branch_name = branch_reference.split('/')[-1]
     return branch_name
 
 

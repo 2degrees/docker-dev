@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2016, 2degrees Limited.
+# Copyright (c) 2016-2017, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of docker-dev
@@ -13,12 +13,14 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from os.path import dirname, basename
 from shutil import rmtree
 
 from docker_dev.docker_interface import run_docker_compose_subcommand, \
     get_docker_compose_config, run_docker_subcommand
 from docker_dev.exceptions import VCSError, PluginError, SubprocessError
 from docker_dev.plugins import get_objects_in_entry_point_group
+
 
 _CONTAINER_TEST_REPORTS_PATH = "/tmp/test-reports"
 
@@ -103,16 +105,23 @@ def uninstall_project(docker_compose_file_path, project_name):
     )
 
 
-def get_project_name_refinement(path):
-    project_name_refiners = get_objects_in_entry_point_group(
-        'project_name_suffix',
+def get_default_project_name(docker_compose_file_path):
+    project_path = dirname(docker_compose_file_path)
+    project_name_generated = _generate_project_name_from_path(project_path)
+    project_name = project_name_generated or basename(project_path)
+    return project_name
+
+
+def _generate_project_name_from_path(path):
+    project_name_generators = get_objects_in_entry_point_group(
+        'project_name_generator',
     )
-    project_name_refinement = None
-    for project_name_refiner in project_name_refiners.values():
+    project_name = None
+    for project_name_generator in project_name_generators.values():
         try:
-            project_name_refinement = project_name_refiner(path)
+            project_name = project_name_generator(path)
         except VCSError:
             continue
         else:
             break
-    return project_name_refinement
+    return project_name

@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2016, 2degrees Limited.
+# Copyright (c) 2016-2017, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of docker-dev
@@ -44,8 +44,8 @@ setup(
         'console_scripts': [
             'docker-dev = docker_dev.cli:main',
         ],
-        'docker_dev.project_name_suffix': [
-            'git = docker_dev.plugins.git_integration:get_active_branch_name',
+        'docker_dev.project_name_generator': [
+            'git = docker_dev.plugins.git_integration:get_project_name',
         ],
     },
 )

@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2016, 2degrees Limited.
+# Copyright (c) 2016-2017, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of docker-dev
@@ -13,7 +13,6 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from os.path import basename, dirname
 
 import click
 
@@ -21,7 +20,7 @@ from docker_dev._logging import handle_callback_exception
 from docker_dev.docker_interface import run_docker_compose_subcommand
 from docker_dev.exceptions import SubprocessError
 from docker_dev.projects import uninstall_project, \
-    get_project_name_refinement, install_project, run_project, test_project
+    get_default_project_name, install_project, run_project, test_project
 
 
 def _calculate_default_project_name(ctx, param, value):
@@ -29,12 +28,7 @@ def _calculate_default_project_name(ctx, param, value):
         project_name = value
     else:
         docker_compose_file_path = ctx.params['docker_compose_file_path']
-        project_path = dirname(docker_compose_file_path)
-        project_name = basename(project_path)
-        project_name_refinement = \
-            get_project_name_refinement(docker_compose_file_path)
-        if project_name_refinement:
-            project_name = '{}-{}'.format(project_name, project_name_refinement)
+        project_name = get_default_project_name(docker_compose_file_path)
     return project_name
 
 

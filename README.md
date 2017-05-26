@@ -68,27 +68,27 @@ fail.
 
 This tool can be extended via the following types of plugins.
 
-### Project Name Suffix Generator
+### Project Name Generator
 
 If your Docker Compose project is in a Git repository, `docker-dev` will append
 the active branch name to the name of the Docker Compose project. If you want
 to override this behaviour or add support for another VCS, you'd need to create
-a function that computes the suffix; e.g.:
+a function that computes the name; e.g.:
 
 ```python
-def get_project_name_suffix(docker_compose_file_path):
+def get_project_name(docker_compose_file_path):
     return 'suffix'
 ```
 
 Finally, you have to register that function in your project's `setup.py` file
-as an entry point for the group `docker_dev.project_name_suffix`. E.g.,
+as an entry point for the group `docker_dev.project_name_generator`. E.g.,
 
 ```python
 setup(
     name='your-distribution',
     entry_points={
-        'docker_dev.project_name_suffix': [
-            'foo = your_package:get_project_name_suffix',
+        'docker_dev.project_name_generator': [
+            'foo = your_package:get_project_name',
         ],
     },
 )
