@@ -25,15 +25,13 @@ def get_project_name(project_path):
 
     repo_path = _get_repo_path_from_path(project_path)
     if repo_path:
-        project_name_parts = [basename(repo_path)]
+        repo_name = basename(repo_path)
+        branch_name = _get_current_branch_name_in_path(project_path)
+        project_name_parts = [repo_name, branch_name]
 
         project_path_relative = relpath(project_path, repo_path)
         if project_path_relative:
             project_name_parts.append(project_path_relative.replace('/', ''))
-
-        project_name_parts.append(
-            _get_current_branch_name_in_path(project_path),
-        )
 
         project_name = '-'.join(project_name_parts)
     else:
