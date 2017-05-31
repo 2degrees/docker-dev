@@ -30,7 +30,7 @@ def get_project_name(project_path):
         project_name_parts = [repo_name, branch_name]
 
         project_path_relative = relpath(project_path, repo_path)
-        if project_path_relative:
+        if not project_path_relative.startswith('.'):
             project_name_parts.append(project_path_relative.replace('/', ''))
 
         project_name = '-'.join(project_name_parts)
