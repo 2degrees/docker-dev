@@ -1,0 +1,49 @@
+##############################################################################
+#
+# Copyright (c) 2017, 2degrees Limited.
+# All Rights Reserved.
+#
+# This file is part of docker-dev
+# <https://github.com/2degrees/docker-dev>, which is subject
+# to the provisions of the BSD at
+# <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
+# license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
+# AND ANY AND ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST
+# INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+
+
+# ===== Add scripts to $PATH
+
+
+CURRENT_FILE_PATH="$(realpath --no-symlinks "${BASH_SOURCE}")"
+export PATH="${PATH}:$(dirname "${CURRENT_FILE_PATH}")"
+unset CURRENT_FILE_PATH
+
+
+# ===== Autocomplete
+
+
+function _autocomplete_dockerdev {
+    local current_word="${COMP_WORDS[COMP_CWORD]}"
+
+    COMPREPLY=()
+
+    case "${COMP_CWORD}" in
+    1)
+        COMPREPLY=( $(compgen -W 'up down run build' -- "${current_word}") )
+        ;;
+    2)
+        local subcommand="${COMP_WORDS[1]}"
+
+        if [[ "${subcommand}" != "down" ]] ; then
+            local services="$(docker-compose config --services 2>>/dev/null)"
+            COMPREPLY=( $(compgen -W "${services}" -- "${current_word}") )
+        fi
+        ;;
+    esac
+}
+
+complete -F _autocomplete_dockerdev docker-dev

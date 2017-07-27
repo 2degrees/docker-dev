@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2016, 2degrees Limited.
+# Copyright (c) 2017, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of docker-dev
@@ -13,15 +13,24 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from pkg_resources import iter_entry_points
+
+set -o nounset
+set -o errexit
+set -o pipefail
 
 
-_ROOT_GROUP_NAME = 'docker_dev'
+# ===== Utilities
 
 
-def get_objects_in_entry_point_group(subgroup_name):
-    group_name = '{}.{}'.format(_ROOT_GROUP_NAME, subgroup_name)
-    objects_by_name = {}
-    for entry_point in iter_entry_points(group_name):
-        objects_by_name[entry_point.name] = entry_point.load()
-    return objects_by_name
+function echo_stderr() {
+    echo "$@" >&2
+}
+
+
+function error_out() {
+    local exit_code="$1"
+    local exit_message="$2"
+
+    echo_stderr "$exit_message"
+    return "$exit_code"
+}

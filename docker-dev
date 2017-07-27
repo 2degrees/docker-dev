@@ -1,0 +1,63 @@
+#!/bin/bash
+##############################################################################
+#
+# Copyright (c) 2017, 2degrees Limited.
+# All Rights Reserved.
+#
+# This file is part of docker-dev
+# <https://github.com/2degrees/docker-dev>, which is subject
+# to the provisions of the BSD at
+# <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
+# license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
+# AND ANY AND ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST
+# INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+. "$(dirname $BASH_SOURCE)/_bootstrap.sh"
+
+
+# ===== Constants and functions
+
+
+PREBUILD_HOOK_FILE_NAME='./.dockerdev-prebuild'
+
+
+function usage {
+    error_out 1 "Usage: ${0##*/} run|up|down|build [EXTRA_ARGS...]"
+}
+
+
+# ===== Main
+
+
+if [[ "$#" == "0" ]]; then
+    usage
+fi
+SUBCOMMAND="$1"
+shift
+
+case "${SUBCOMMAND}" in
+    run)
+        exec docker-compose run --rm "$@"
+        ;;
+    up)
+        exec docker-compose up \
+            --force-recreate \
+            --abort-on-container-exit \
+            --remove-orphans \
+            "$@"
+        ;;
+    down)
+        exec docker-compose down --rmi local --volumes --remove-orphans "$@"
+        ;;
+    build)
+        if [[ -x "${PREBUILD_HOOK_FILE_NAME}" ]]; then
+            "${PREBUILD_HOOK_FILE_NAME}"
+        fi
+        exec docker-compose build --force-rm --pull "$@"
+        ;;
+    *)
+        usage
+        ;;
+esac

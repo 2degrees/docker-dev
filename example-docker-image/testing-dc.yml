@@ -1,8 +1,0 @@
-version: "2"
-services:
-  test-main:
-    build:
-      context: "python-distribution-1/"
-      dockerfile: "Dockerfile"
-    command: "./run-tests.sh"
-    network_mode: "none"
