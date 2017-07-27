@@ -38,3 +38,8 @@ docker-dev build webapp
 ```
 
 `docker-dev` supports autocompletion in a Bash session.
+
+## `docker-clean`
+
+This command will remove **all** your Docker resources (e.g., containers,
+volumes), except for images created in the past week.

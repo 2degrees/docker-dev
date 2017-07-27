@@ -1,0 +1,26 @@
+#!/bin/bash
+##############################################################################
+#
+# Copyright (c) 2017, 2degrees Limited.
+# Copyright (c) 2017, Gustavo Narea.
+#
+# This file is part of docker-dev
+# <https://github.com/2degrees/docker-dev>, which is subject
+# to the provisions of the BSD at
+# <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
+# license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
+# AND ANY AND ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST
+# INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+. "$(dirname $BASH_SOURCE)/_bootstrap.sh"
+
+
+docker ps --quiet --all | \
+    xargs --no-run-if-empty docker rm --force --volumes >> /dev/null
+
+docker system prune --force
+
+docker images | egrep '(weeks|months|years) ago' | awk '{ print $3 }' | \
+    xargs --no-run-if-empty docker rmi --force >> /dev/null
