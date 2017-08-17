@@ -33,7 +33,7 @@ function _autocomplete_dockerdev {
 
     case "${COMP_CWORD}" in
     1)
-        COMPREPLY=( $(compgen -W 'up down run build' -- "${current_word}") )
+        COMPREPLY=( $(compgen -W 'up up2 down run build' -- "${current_word}") )
         ;;
     2)
         local subcommand="${COMP_WORDS[1]}"

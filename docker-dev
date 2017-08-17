@@ -24,7 +24,39 @@ PREBUILD_HOOK_FILE_NAME='./.dockerdev-prebuild'
 
 
 function usage {
-    error_out 1 "Usage: ${0##*/} run|up|down|build [EXTRA_ARGS...]"
+    error_out 1 "Usage: ${0##*/} run|up|up2|down|build [EXTRA_ARGS...]"
+}
+
+
+function get_dependent_services_for_service {
+    local service="$1"
+
+    # The only way to calculate the dependent services is by starting the
+    # required services!
+    docker-compose rm --force -v >>/dev/null 2>&1
+    local container_names="$(
+        docker-compose create full 2>&1 | \
+            egrep '^Creating' | \
+            awk '{ print $2 }' | \
+            sort | \
+            uniq
+    )"
+
+    if [[ ${container_names} ]]; then
+        echo "${container_names}" |
+            xargs \
+                --no-run-if-empty \
+                docker \
+                inspect \
+                --format '{{ index .Config.Labels "com.docker.compose.service" }}'
+
+        docker rm --volumes ${container_names} >> /dev/null
+    else
+        error_out \
+            2 \
+            'Could not find dependent services; containers may be running.'
+        exit 2
+    fi
 }
 
 
@@ -47,6 +79,9 @@ case "${SUBCOMMAND}" in
             --abort-on-container-exit \
             --remove-orphans \
             "$@"
+        ;;
+    up2)
+        exec "${BASH_SOURCE}" up $(get_dependent_services_for_service "$@")
         ;;
     down)
         exec docker-compose down --rmi local --volumes --remove-orphans "$@"
