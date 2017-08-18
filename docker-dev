@@ -33,7 +33,7 @@ function get_dependent_services_for_services {
 
     # The only way to calculate the dependent services is by starting the
     # required services!
-    docker-compose rm --force -v >>/dev/null 2>&1
+    docker-compose rm --force -v >>/dev/null
     local container_names="$(
         docker-compose create ${services} 3>&2 2>&1 1>&3- | \
             egrep '^Creating' | \
@@ -52,10 +52,7 @@ function get_dependent_services_for_services {
 
         docker rm --volumes ${container_names} >> /dev/null
     else
-        error_out \
-            2 \
-            'Could not find dependent services; containers may be running.'
-        exit 2
+        error_out 2 'Could not find dependent services'
     fi
 }
 
@@ -81,7 +78,8 @@ case "${SUBCOMMAND}" in
             "$@"
         ;;
     up2)
-        exec "${BASH_SOURCE}" up $(get_dependent_services_for_services "$@")
+        all_services="$(get_dependent_services_for_services "$@")"
+        exec "${BASH_SOURCE}" up ${all_services}
         ;;
     down)
         exec docker-compose down --rmi local --volumes --remove-orphans "$@"
