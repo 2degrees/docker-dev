@@ -28,14 +28,14 @@ function usage {
 }
 
 
-function get_dependent_services_for_service {
-    local service="$1"
+function get_dependent_services_for_services {
+    local services="$@"
 
     # The only way to calculate the dependent services is by starting the
     # required services!
     docker-compose rm --force -v >>/dev/null 2>&1
     local container_names="$(
-        docker-compose create full 2>&1 | \
+        docker-compose create ${services} 3>&2 2>&1 1>&3- | \
             egrep '^Creating' | \
             awk '{ print $2 }' | \
             sort | \
@@ -81,7 +81,7 @@ case "${SUBCOMMAND}" in
             "$@"
         ;;
     up2)
-        exec "${BASH_SOURCE}" up $(get_dependent_services_for_service "$@")
+        exec "${BASH_SOURCE}" up $(get_dependent_services_for_services "$@")
         ;;
     down)
         exec docker-compose down --rmi local --volumes --remove-orphans "$@"
